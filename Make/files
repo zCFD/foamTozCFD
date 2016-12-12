@@ -1,4 +1,4 @@
 zCFDFvMesh.C
 foamTozCFD.C
 
-EXE = $(FOAM_APPBIN)/foamTozCFD
+EXE = $(FOAM_USER_APPBIN)/foamTozCFD
