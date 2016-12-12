@@ -1,5 +1,5 @@
 # foamTozCFD
-OpenFoam to zCFD converter
+OpenFOAM to zCFD converter
 
 ## Build Dependencies:
 
@@ -9,16 +9,16 @@ set environment variable HDF5_HOME to install location
 
 hdf5 helper from https://github.com/zenotech/hdf5
 
-Install in $HDF5_HOME/include
+Install/clone in $HDF5_HOME/include
 
 ## Build instructions:
 
-source ~/OpenFoam/OpenFoam-X.X/etc/bashrc
+source ~/OpenFOAM/OpenFOAM-X.X/etc/bashrc
 
 wmake
 
 ## Run instructions:
 
-source ~/OpenFoam/OpenFoam-X.X/etc/bashrc
+source ~/OpenFOAM/OpenFOAM-X.X/etc/bashrc
 
 foamTozCFD
