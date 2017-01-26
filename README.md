@@ -9,11 +9,7 @@ hdf5 from https://support.hdfgroup.org/HDF5/
 
 Both of these are available from standard package repositories
 
-set environment variable HDF5_HOME to install location
-
-hdf5 helper from https://github.com/zenotech/hdf5
-
-Install/clone in $HDF5_HOME/include
+set environment variable HDF5_HOME to the install location
 
 ## Build instructions:
 
