@@ -2,4 +2,4 @@ EXE_INC = \
     -I$(HDF5_HOME)/include  -I$(LIB_SRC)/finiteVolume/lnInclude
 
 EXE_LIBS = \
-    -lfiniteVolume -L$(HDF5_HOME)/lib -lhdf5 -lmpi_cxx
+    -lfiniteVolume -L$(HDF5_HOME)/lib -lhdf5
