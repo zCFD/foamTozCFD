@@ -26,6 +26,7 @@ License
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <hdf5/hdffile.hpp>
 #include <hdf5/hdfdataset.hpp>
 
@@ -286,7 +287,7 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
     }
 
     Info<< "Writing Boundary Conditions" << endl;
-
+    std::vector<std::string> bcType;
     { // FaceBC
       std::vector<int> faceBC(numFaces, 0);
       int i=0;
@@ -296,24 +297,27 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
       }
       forAll(boundary(), patchI)
       {
-          const faceUList& patchFaces = boundaryMesh()[patchI];
-          forAll(patchFaces, faceI)
-          {
             int bc = -1;
             // Write patch type
              if (isA<wallFvPatch>(boundary()[patchI]))
              {
                  bc=3;
+                 bcType.push_back("wall");
              }
              else if (isA<symmetryFvPatch>(boundary()[patchI]))
              {
                  bc=7;
+                 bcType.push_back("symmetry");
              }
              else
              {
                  bc=9;
+                 bcType.push_back("freestream");
              }
 
+          const faceUList& patchFaces = boundaryMesh()[patchI];
+          forAll(patchFaces, faceI)
+          {
             faceBC[i] = bc; i++;
           }
       }
@@ -323,6 +327,7 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
       hdf::Slab<1> d1(fileDims);
       meshg->createDataset<int>("faceBC", d1)->writeData(faceBC);
     }
+    std::map<int,std::string> bcNames;
     { // Face Info
       std::vector<int> faceInfo;
       faceInfo.reserve(2 * numFaces);
@@ -336,10 +341,14 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
       forAll(boundary(), patchI)
       {
           const faceUList& patchFaces = boundaryMesh()[patchI];
+          const wordList& names = boundaryMesh().names();
+
+          int z = patchI+1;
+          bcNames[patchI] = names[patchI];
+
           forAll(patchFaces, faceI)
           {
 
-        int z = patchI+1;
         int dummy = 0;
         faceInfo.push_back(z);
         faceInfo.push_back(dummy);
@@ -349,6 +358,75 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
       fileDims[1] = 2;
       hdf::Slab<1> d1(fileDims);
       meshg->createDataset<int>("faceInfo", d1)->writeData(faceInfo);
+    }
+
+    { // zone.py
+          // Write zone helper
+   std::string filename = (
+        time().rootPath()/
+        time().caseName()/
+        "zCFDInterface"/
+        time().caseName() + "_zone.py"
+    ).c_str();
+
+    std::ofstream out(filename.c_str());
+
+    std::map<std::string, std::string> bcMap;
+    bcMap["interior"] = "interior";
+    bcMap["symmetry"] = "symmetry";
+    bcMap["symmetry2"] = "symmetry plane";
+    bcMap["freestream"] = "freestream";
+    bcMap["wall"] = "wall";
+    bcMap["inlet"] = "inlet";
+    bcMap["pressure"] = "pressure";
+
+    int zoneId = 1;
+
+    out << "# Zone handling helper functions\n\n";
+    out << "zone_name_to_id={";
+    for (std::vector<std::string>::iterator itr = bcType.begin(); itr != bcType.end();
+         ++itr) {
+      out << "\"" << bcNames[zoneId - 1] << "\": " << zoneId << ",\n";
+      zoneId++;
+    }
+    out << "}\n";
+
+    out << "id_to_zone_name= {v: k for k, v in zone_name_to_id.items()}\n";
+
+    out << "def to_id(names):\n";
+    out << "    # Converts names list to id list\n";
+    out << "    id=[]\n";
+    out << "    for n in names:\n";
+    out << "        id.append(zone_name_to_id[n])\n";
+    out << "    return id\n";
+    out << "def from_id(id):\n";
+    out << "    # returns name of id\n";
+    out << "    return id_to_zone_name[id]\n";
+
+    out << "fluid_zone={";
+    out << "\""
+        << "fluid"
+        << "\": " << 1 << ",\n";
+    out << "}\n";
+
+    for (std::map<std::string, std::string>::iterator bit = bcMap.begin();
+         bit != bcMap.end(); ++bit) {
+      out << bit->first << "=[";
+      zoneId = 1;
+      for (std::vector<std::string>::iterator itr = bcType.begin(); itr != bcType.end();
+           ++itr) {
+        std::string bcName = *itr;
+
+        if (bcName == bit->second) {
+          out << "\"" << bcNames[zoneId - 1] << "\",";
+        }
+        zoneId++;
+      }
+      out << "]\n";
+    }
+    out.close();
+
+
     }
 
 }
