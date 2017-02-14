@@ -40,6 +40,14 @@ using std::ios;
 #include "symmetryFvPatch.H"
 #include "cellModeller.H"
 
+#ifdef VERSION-1.6-ext-
+#define FOAM_EXTEND
+#endif
+
+#ifdef VERSION-3.1-extend
+#define FOAM_EXTEND
+#endif
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::zCFDFvMesh::zCFDFvMesh(const IOobject& io)
@@ -102,10 +110,13 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
 
        Info<< "Writing Neighbours" << endl;
 
-
+#ifdef FOAM_EXTEND
+    const labelList& own = owner();
+    const labelList& nei = neighbour();
+#else
     const labelUList& own = owner();
     const labelUList& nei = neighbour();
-
+#endif
 
     //const labelUList& cellZone = cellZones();
 /*
@@ -189,8 +200,11 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
 
       forAll(boundary(), patchI)
       {
+#ifdef FOAM_EXTEND
+          const faceList& patchFaces = boundaryMesh()[patchI];
+#else
           const faceUList& patchFaces = boundaryMesh()[patchI];
-
+#endif
           const labelList& patchFaceCells =
               boundaryMesh()[patchI].faceCells();
           forAll(patchFaces, faceI)
@@ -241,7 +255,11 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
       }
       forAll(boundary(), patchI)
       {
+#ifdef FOAM_EXTEND
+          const faceList& patchFaces = boundaryMesh()[patchI];
+#else
           const faceUList& patchFaces = boundaryMesh()[patchI];
+#endif
           forAll(patchFaces, faceI)
           {
               const labelList& l = patchFaces[faceI];
@@ -273,7 +291,11 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
       }
       forAll(boundary(), patchI)
       {
+#ifdef FOAM_EXTEND
+          const faceList& patchFaces = boundaryMesh()[patchI];
+#else
           const faceUList& patchFaces = boundaryMesh()[patchI];
+#endif
           forAll(patchFaces, faceI)
           {
               const labelList& l = patchFaces[faceI];
@@ -314,8 +336,11 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
                  bc=9;
                  bcType.push_back("freestream");
              }
-
+#ifdef FOAM_EXTEND
+          const faceList& patchFaces = boundaryMesh()[patchI];
+#else
           const faceUList& patchFaces = boundaryMesh()[patchI];
+#endif
           forAll(patchFaces, faceI)
           {
             faceBC[i] = bc; i++;
@@ -340,7 +365,11 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
       }
       forAll(boundary(), patchI)
       {
+#ifdef FOAM_EXTEND
+          const faceList& patchFaces = boundaryMesh()[patchI];
+#else
           const faceUList& patchFaces = boundaryMesh()[patchI];
+#endif
           const wordList& names = boundaryMesh().names();
 
           int z = patchI+1;

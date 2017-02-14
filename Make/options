@@ -1,4 +1,4 @@
-EXE_INC = \
+EXE_INC = -DVERSION-$(WM_PROJECT_VERSION)-$(WM_FORK) \
     -I$(HDF5_HOME)/include  -I$(LIB_SRC)/finiteVolume/lnInclude
 
 EXE_LIBS = \
