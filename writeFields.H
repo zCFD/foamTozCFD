@@ -51,8 +51,8 @@ word writeVolumeFieldData
     const instant& runTime,
     const fvMesh& mesh,
     const double Vel_inf,
-    const double M_inf,
-    const double R_inf
+    const double P_inf,
+    const double R_inf,
 )
 {
 
@@ -131,8 +131,6 @@ word writeVolumeFieldData
     
     Info<<"Fetching velocity data, variable=" << velocity_field  <<nl;
 
-    std::vector<std::vector<double>> velocity(numCells,std::vector<double>(3));
-
     // Velocity
     volVectorField velocity_fld
     (
@@ -148,6 +146,8 @@ word writeVolumeFieldData
     );
     // Need u_inf and M_inf to non dimensionalise
     double gamma = 1.4;
+    auto M_inf = Vel_inf / sqrt(gamma * P_inf/R_inf);
+
     for (label indx=0; indx<mesh.nCells(); ++indx)
     {
         foam_fields[1+indx*num_vars] = velocity_fld[indx].x()/Vel_inf * sqrt(gamma) * M_inf;
@@ -172,13 +172,13 @@ word writeVolumeFieldData
     }
 
     if(num_vars > 5){
-        Info<<"Fetching turbulance data, variable=k" <<nl;
+        Info<<"Fetching turbulence data, variable=k" <<nl;
 
         volScalarField k_fld
         (
             IOobject
             (
-                    k_fld,
+                    "k",
                     runTime.name(),
                     mesh,
                     IOobject::MUST_READ,
@@ -190,7 +190,7 @@ word writeVolumeFieldData
         {
             foam_fields[5+indx*num_vars] = k_fld[indx] / (Vel_inf*Vel_inf) * gamma * M_inf;
         }
-        Info<<"Fetching turbulance data, variable=" << turb_field <<nl;
+        Info<<"Fetching turbulence data, variable=" << turb_field <<nl;
 
         volScalarField omega_fld
         (
@@ -206,7 +206,7 @@ word writeVolumeFieldData
         );
         for (label indx=0; indx<mesh.nCells(); ++indx)
         {
-            foam_fields[6+indx*num_vars] = omega_fld[indx];
+            foam_fields[6+indx*num_vars] = omega_fld[indx] / sqrt(P_inf/R_inf);
         }
     }
 

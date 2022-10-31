@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
     );
     argList::addOption
     (
-        "minf",
+        "pinf",
         "n",
-        "Freestream Mach number"
+        "Freestream Pressure"
     );
     argList::addOption
     (
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     word pressureField;
     word turbField;
     double Vel_inf;
-    double M_inf;
+    double P_inf;
     double R_inf;
 
     if (!args.readIfPresent("v", velocityField))
@@ -120,10 +120,10 @@ int main(int argc, char *argv[])
             Info<<"Error Freestream velocity not set, cannot write results with this. Please supply one with -uinf"<<nl;
             return 1;
         }
-        if (!args.readIfPresent("minf", M_inf))
+        if (!args.readIfPresent("pinf", P_inf))
         {
-            Info<<"Freestream mach number not set, assuming sea level and converting freestream velocity. If incorrect supply one with -minf"<<nl;
-            M_inf = Vel_inf / 343;
+            Info<<"Freestream pressure not set, assuming sea level and converting freestream velocity. If incorrect supply one with -pinf"<<nl;
+            P_inf = 101325.0;
         }
         if (!args.readIfPresent("rinf", R_inf))
         {
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
         Info<< nl << "Writing results in zCFD format"<<nl;
         Info<<"Velocity field name = "<<  velocityField << nl;
         Info<<"Pressure field name = "<<  pressureField << nl;
-        Info<<"Converting results with Ref Velocity="<< Vel_inf << ", Ref Mach number=" << M_inf << ", Ref density="<< R_inf<<nl;
+        Info<<"Converting results with Ref Velocity="<< Vel_inf << ", Ref pressure=" << P_inf << ", Ref density="<< R_inf<<nl;
 
         // get the available time-steps
         instantList TimeList = runTime.times();
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
             {
 
                 Info<< "Time = " << TimeList[n].value() << nl;
-                word solution_file = writeVolumeFieldData(velocityField, pressureField, turbField, TimeList[n], mesh, Vel_inf, M_inf, R_inf);
+                word solution_file = writeVolumeFieldData(velocityField, pressureField, turbField, TimeList[n], mesh, Vel_inf, P_inf, R_inf);
                 Info<< "Solution written to "<< solution_file <<nl;
             }
         }
