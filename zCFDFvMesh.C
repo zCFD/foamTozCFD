@@ -58,9 +58,9 @@ Foam::zCFDFvMesh::zCFDFvMesh(const IOobject& io)
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::zCFDFvMesh::writezCFDMesh() const
+Foam::word Foam::zCFDFvMesh::writezCFDMesh() const
 {
-    // make a directory called proInterface in the case
+    // make a directory called zCFDInterface in the case
     mkDir(time().rootPath()/time().caseName()/"zCFDInterface");
 
     // open a file for the mesh
@@ -85,8 +85,7 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
 
     std::vector<hsize_t> fileDims(2);
 
-   Info<< "Writing Points" << endl;
-
+    Info<< "Writing Points" << endl;
 
     // Writing points
     {
@@ -457,6 +456,7 @@ void Foam::zCFDFvMesh::writezCFDMesh() const
 
 
     }
+    return filename;
 
 }
 
