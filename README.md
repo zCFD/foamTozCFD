@@ -1,4 +1,4 @@
-# foamTozCFD
+# foamTozCFD Converter
 OpenFOAM to zCFD HDF5 converter
 
 ## Build Dependencies:
@@ -20,6 +20,13 @@ wmake
 
 ## Run instructions:
 
+
+To get a list of the available options run
+```
+source ~/OpenFOAM/OpenFOAM-X.X/etc/bashrc
+foamTozCFD -help
+```
+
 ### Mesh conversion
 
 ```
@@ -30,5 +37,11 @@ foamTozCFD
 
 ### Export solution
 
+The converter can also write the Foam solution out to zCFD format to allow for restarts from a Foam run. 
 
-foamTozCFD
+```
+source ~/OpenFOAM/OpenFOAM-X.X/etc/bashrc
+foamTozCFD -results
+
+```
+
