@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     );
     argList::addOption
     (
-        "vinf",
+        "uinf",
         "n",
         "Freestream velocity"
     );
@@ -115,20 +115,20 @@ int main(int argc, char *argv[])
         turbField = "omega";
     }
     if (writeResults){
-        if (!args.readIfPresent("vinf", Vel_inf))
+        if (!args.readIfPresent("uinf", Vel_inf))
         {
-            Info<<"Error Freestream velocity not set, cannot write results with this. Please supply one with -vinf"<<nl;
+            Info<<"Error Freestream velocity not set, cannot write results with this. Please supply one with -uinf"<<nl;
             return 1;
         }
         if (!args.readIfPresent("minf", M_inf))
         {
-            Info<<"Error Freestream mach number not set, cannot write results with this. Please supply one with -minf"<<nl;
-            return 1;
+            Info<<"Freestream mach number not set, assuming sea level and converting freestream velocity. If incorrect supply one with -minf"<<nl;
+            M_inf = Vel_inf / 335;
         }
         if (!args.readIfPresent("rinf", R_inf))
         {
-            Info<<"Error Freestream density not set, cannot write results with this. Please supply one with -rinf"<<nl;
-            return 1;
+            Info<<"Error Freestream density not set, assuming sea level. If incorrect supply one with -rinf"<<nl;
+            R_inf = 1.225;
         }
     }
 
@@ -166,6 +166,7 @@ int main(int argc, char *argv[])
         Info<< nl << "Writing results in zCFD format"<<nl;
         Info<<"Velocity field name = "<<  velocityField << nl;
         Info<<"Pressure field name = "<<  pressureField << nl;
+        Info<<"Converting results with Ref Velocity="<< Vel_inf << ", Ref Mach number=" << M_inf << ", Ref density="<< R_inf<<nl;
 
         // get the available time-steps
         instantList TimeList = runTime.times();
