@@ -83,6 +83,12 @@ int main(int argc, char *argv[])
         "n",
         "Freestream Mach number"
     );
+    argList::addOption
+    (
+        "rinf",
+        "n",
+        "Freestream Density"
+    );
 
 
     #include "setRootCase.H"
@@ -94,6 +100,7 @@ int main(int argc, char *argv[])
     word turbField;
     double Vel_inf;
     double M_inf;
+    double R_inf;
 
     if (!args.readIfPresent("v", velocityField))
     {
@@ -116,6 +123,11 @@ int main(int argc, char *argv[])
         if (!args.readIfPresent("minf", M_inf))
         {
             Info<<"Error Freestream mach number not set, cannot write results with this. Please supply one with -minf"<<nl;
+            return 1;
+        }
+        if (!args.readIfPresent("rinf", R_inf))
+        {
+            Info<<"Error Freestream density not set, cannot write results with this. Please supply one with -rinf"<<nl;
             return 1;
         }
     }
@@ -165,7 +177,7 @@ int main(int argc, char *argv[])
             {
 
                 Info<< "Time = " << TimeList[n].value() << nl;
-                word solution_file = writeVolumeFieldData(velocityField, pressureField, turbField, TimeList[n], mesh, Vel_inf, M_inf);
+                word solution_file = writeVolumeFieldData(velocityField, pressureField, turbField, TimeList[n], mesh, Vel_inf, M_inf, R_inf);
                 Info<< "Solution written to "<< solution_file <<nl;
             }
         }

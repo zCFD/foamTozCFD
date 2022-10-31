@@ -51,7 +51,8 @@ word writeVolumeFieldData
     const instant& runTime,
     const fvMesh& mesh,
     const double Vel_inf,
-    const double M_inf
+    const double M_inf,
+    const double R_inf
 )
 {
 
@@ -177,7 +178,7 @@ word writeVolumeFieldData
     // Set total energy
     for (label indx=0; indx<mesh.nCells(); ++indx)
     {
-        auto p = fld[indx];
+        auto p = fld[indx] * R_inf;
         auto u = foam_fields[1+indx*5];
         auto v = foam_fields[2+indx*5];
         auto w = foam_fields[3+indx*5];
