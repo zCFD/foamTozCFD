@@ -21,13 +21,16 @@ wmake
 ## Run instructions:
 
 
-To get a list of the available options run
+To convert a case run foamTozCFD in your OpenFOAM case directory. The output will be created in a directory called "zCFDInterface" in the case directory. To get a list of the available options run.
 ```
 source ~/OpenFOAM/OpenFOAM-X.X/etc/bashrc
 foamTozCFD -help
 ```
 
 ### Mesh conversion
+
+
+The mesh conversion will create a zCFD compatable HDF5 mesh file and also a python diction containing the boundary condition to zone mappings for zCFD.
 
 ```
 source ~/OpenFOAM/OpenFOAM-X.X/etc/bashrc
@@ -39,9 +42,11 @@ foamTozCFD
 
 The converter can also write the Foam solution out to zCFD format to allow for restarts from a Foam run. 
 
+To convert the solution you will need to provide a reference velocity using the "-uinf" option. You can also supply a reference mach number (-minf) and density (-rinf), if you don't supply these then the values at sea level will be assumed. 
+
 ```
 source ~/OpenFOAM/OpenFOAM-X.X/etc/bashrc
-foamTozCFD -results
+foamTozCFD -results -uinf 20
 
 ```
 
