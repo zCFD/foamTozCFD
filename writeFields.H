@@ -9,7 +9,7 @@
 namespace Foam
 {
 
-wordHashSet checkzGoodFields
+wordHashSet checkGoodFields
 (
     const instant& runTime,
     const fvMesh& mesh,
@@ -39,13 +39,10 @@ wordHashSet checkzGoodFields
         }
     }   
     
-    Info<< "good=" << goodFields << nl;
+    Info<< "Good=" << goodFields << nl;
     return goodFields;
 }
 
-/*---------------------------------------------------------------------------*\
-1. Collect 
-\*---------------------------------------------------------------------------*/
 word writeVolumeFieldData
 (
     const word& velocity_field,
@@ -147,7 +144,7 @@ word writeVolumeFieldData
         // omega[indx] = omega_fld[indx];
     }
     
-    Info<<"Fetching velocity data, varible=" << velocity_field  <<nl;
+    Info<<"Fetching velocity data, variable=" << velocity_field  <<nl;
 
     std::vector<std::vector<double>> velocity(numCells,std::vector<double>(3));
 
@@ -180,7 +177,7 @@ word writeVolumeFieldData
     // Set total energy
     for (label indx=0; indx<mesh.nCells(); ++indx)
     {
-        auto p = fld[index];
+        auto p = fld[indx];
         auto u = foam_fields[1+indx*5];
         auto v = foam_fields[2+indx*5];
         auto w = foam_fields[3+indx*5];

@@ -74,13 +74,13 @@ int main(int argc, char *argv[])
     argList::addOption
     (
         "vinf",
-        "name",
+        "n",
         "Freestream velocity"
     );
     argList::addOption
     (
         "minf",
-        "name",
+        "n",
         "Freestream Mach number"
     );
 
@@ -92,6 +92,8 @@ int main(int argc, char *argv[])
     word velocityField;
     word pressureField;
     word turbField;
+    double Vel_inf;
+    double M_inf;
 
     if (!args.readIfPresent("v", velocityField))
     {
@@ -105,6 +107,19 @@ int main(int argc, char *argv[])
     {
         turbField = "omega";
     }
+    if (writeResults){
+        if (!args.readIfPresent("vinf", Vel_inf))
+        {
+            Info<<"Error Freestream velocity not set, cannot write results with this. Please supply one with -vinf"<<nl;
+            return 1;
+        }
+        if (!args.readIfPresent("minf", M_inf))
+        {
+            Info<<"Error Freestream mach number not set, cannot write results with this. Please supply one with -minf"<<nl;
+            return 1;
+        }
+    }
+
 
     Info<< "Create mesh for time = "
         << runTime.timeName() << nl << endl;
