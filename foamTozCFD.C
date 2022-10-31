@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         if (!args.readIfPresent("minf", M_inf))
         {
             Info<<"Freestream mach number not set, assuming sea level and converting freestream velocity. If incorrect supply one with -minf"<<nl;
-            M_inf = Vel_inf / 335;
+            M_inf = Vel_inf / 343;
         }
         if (!args.readIfPresent("rinf", R_inf))
         {
