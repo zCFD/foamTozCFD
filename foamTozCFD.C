@@ -71,6 +71,18 @@ int main(int argc, char *argv[])
         "name",
         "Field name for turbulance variable (Default omega)"
     );
+    argList::addOption
+    (
+        "vinf",
+        "name",
+        "Freestream velocity"
+    );
+    argList::addOption
+    (
+        "minf",
+        "name",
+        "Freestream Mach number"
+    );
 
 
     #include "setRootCase.H"
@@ -138,7 +150,7 @@ int main(int argc, char *argv[])
             {
 
                 Info<< "Time = " << TimeList[n].value() << nl;
-                word solution_file = writeVolumeFieldData(velocityField, pressureField, turbField, TimeList[n], mesh);
+                word solution_file = writeVolumeFieldData(velocityField, pressureField, turbField, TimeList[n], mesh, Vel_inf, M_inf);
                 Info<< "Solution written to "<< solution_file <<nl;
             }
         }

@@ -52,7 +52,9 @@ word writeVolumeFieldData
     const word& pressure_field,
     const word& turb_field,
     const instant& runTime,
-    const fvMesh& mesh
+    const fvMesh& mesh,
+    const double Vel_inf,
+    const double M_inf
 )
 {
 
@@ -98,11 +100,12 @@ word writeVolumeFieldData
     solutionDims[1] = 5; //number of variables to write
     hdf::Slab<1> d2(solutionDims);
     
-    std::vector<double> foam_fields(numCells*5);
+    std::vector<double> foam_fields(numCells*5, 1.0);
 
     Info<<"Fetching pressure data, variable="<< pressure_field <<nl;
     std::vector<int> pressure(numCells);
 
+    // Pressure
     volScalarField fld
     (
         IOobject
@@ -115,10 +118,11 @@ word writeVolumeFieldData
         ),
         mesh
     );
+
+    // Set density
     for (label indx=0; indx<mesh.nCells(); ++indx)
     {
-        foam_fields[indx*5] = fld[indx];
-        // pressure[indx] = fld[indx];
+        foam_fields[0 + indx*5] = 1.0;
     }
 
     Info<<"Fetching turbulance data, variable=" << turb_field <<nl;
@@ -139,7 +143,7 @@ word writeVolumeFieldData
     );
     for (label indx=0; indx<mesh.nCells(); ++indx)
     {
-        foam_fields[4+indx*5] = omega_fld[indx];
+        // foam_fields[4+indx*5] = omega_fld[indx];
         // omega[indx] = omega_fld[indx];
     }
     
@@ -147,6 +151,7 @@ word writeVolumeFieldData
 
     std::vector<std::vector<double>> velocity(numCells,std::vector<double>(3));
 
+    // Velocity
     volVectorField velocity_fld
     (
         IOobject
@@ -159,15 +164,31 @@ word writeVolumeFieldData
         ),
         mesh
     );
+    // Need u_inf and M_inf to non dimensionalise
+    double gamma = 1.4;
     for (label indx=0; indx<mesh.nCells(); ++indx)
     {
-        foam_fields[1+indx*5] = velocity_fld[indx].x();
-        foam_fields[2+indx*5] = velocity_fld[indx].y();
-        foam_fields[3+indx*5] = velocity_fld[indx].z();
+        foam_fields[1+indx*5] = velocity_fld[indx].x()/Vel_inf * sqrt(gamma) * M_inf;
+        foam_fields[2+indx*5] = velocity_fld[indx].y()/Vel_inf * sqrt(gamma) * M_inf;
+        foam_fields[3+indx*5] = velocity_fld[indx].z()/Vel_inf * sqrt(gamma) * M_inf;
+
         // velocity[indx][0] = velocity_fld[indx].x();
         // velocity[indx][1] = velocity_fld[indx].y();
         // velocity[indx][2] = velocity_fld[indx].z();
     }
+
+    // Set total energy
+    for (label indx=0; indx<mesh.nCells(); ++indx)
+    {
+        auto p = fld[index];
+        auto u = foam_fields[1+indx*5];
+        auto v = foam_fields[2+indx*5];
+        auto w = foam_fields[3+indx*5];
+        auto rE = p / (gamma - 1.0) + 0.5 * (u*u + v*v + w*w);
+
+        foam_fields[4 + indx*5] = rE;
+    }
+
     Info<<"Done fetching data"<<nl;
 
     Info<<"Writing solution data"<<nl;
