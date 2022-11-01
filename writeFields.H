@@ -52,7 +52,7 @@ word writeVolumeFieldData
     const fvMesh& mesh,
     const double Vel_inf,
     const double P_inf,
-    const double R_inf,
+    const double R_inf
 )
 {
 
