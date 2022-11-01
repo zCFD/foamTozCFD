@@ -206,7 +206,7 @@ word writeVolumeFieldData
         );
         for (label indx=0; indx<mesh.nCells(); ++indx)
         {
-            foam_fields[6+indx*num_vars] = omega_fld[indx] / sqrt(P_inf/R_inf);
+            foam_fields[6+indx*num_vars] = omega_fld[indx] * sqrt(P_inf/R_inf);
         }
     }
 
