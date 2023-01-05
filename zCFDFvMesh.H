@@ -60,7 +60,7 @@ public:
     // Member functions
 
         //- Write Fluent mesh
-        void writezCFDMesh() const;
+        Foam::word writezCFDMesh() const;
 };
 
 
