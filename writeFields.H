@@ -72,11 +72,11 @@ word writeVolumeFieldData
     boost::shared_ptr<hdf::HDFGroup<> > rung = file.openGroup("run", true);
     std::vector<hsize_t> dims(1, 1);
 
-    rung->createAttribute<int>("Cycle", dims)->writeData(1);
+    rung->createAttribute<int>("Cycle", dims)->writeData(0);
     rung->createAttribute<int>("NumProcessors", dims)->writeData(1);
     rung->createAttribute<int>("TimeCycle", dims)->writeData(0);
     rung->createAttribute<int>("TurbModelSANEG", dims)->writeData(0);
-    rung->createAttribute<int>("TurbModelSST", dims)->writeData(0);
+    rung->createAttribute<int>("TurbModelSST", dims)->writeData(1);
     rung->createAttribute<int>("TurbModelSSTTrans", dims)->writeData(0);
     rung->createAttribute<int>("TurbSSTModelLnOmega", dims)->writeData(0);
     rung->createAttribute<int>("OpenFoamExport", dims)->writeData(1);
@@ -90,7 +90,7 @@ word writeVolumeFieldData
     } 
     fileDims[0] = numCells;
     hdf::Slab<1> d1(fileDims);
-    rung->createDataset<int>("globalIndex", d1)->writeData(cellIndex);
+    rung->createDataset<int>("globalToLocalIndex", d1)->writeData(cellIndex);
     
     Info<<"Exporting solution data from Foam"<<nl;
 
@@ -107,7 +107,6 @@ word writeVolumeFieldData
     std::vector<double> foam_fields(numCells*num_vars, 1.0);
 
     Info<<"Fetching pressure data, variable="<< pressure_field <<nl;
-    std::vector<int> pressure(numCells);
 
     // Pressure
     volScalarField fld
@@ -162,7 +161,7 @@ word writeVolumeFieldData
     // Set total energy
     for (label indx=0; indx<mesh.nCells(); ++indx)
     {
-        auto p = fld[indx] * R_inf;
+        auto p = ((P_inf + fld[indx]) * R_inf) / P_inf;
         auto u = foam_fields[1+indx*num_vars];
         auto v = foam_fields[2+indx*num_vars];
         auto w = foam_fields[3+indx*num_vars];
@@ -188,7 +187,7 @@ word writeVolumeFieldData
         );
         for (label indx=0; indx<mesh.nCells(); ++indx)
         {
-            foam_fields[5+indx*num_vars] = k_fld[indx] / (Vel_inf*Vel_inf) * gamma * M_inf;
+            foam_fields[5+indx*num_vars] = k_fld[indx] / (Vel_inf*Vel_inf) * gamma * M_inf * M_inf;
         }
         Info<<"Fetching turbulence data, variable=" << turb_field <<nl;
 
