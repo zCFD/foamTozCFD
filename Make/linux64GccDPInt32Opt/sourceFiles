@@ -1,5 +1,0 @@
-SOURCE = \
-zCFDFvMesh.C \
-foamTozCFD.C \
-
-# sources
